@@ -1,6 +1,6 @@
 # mini-single-spa
 
-a mini-single-spa source code
+根据微前端框架single-spa源码后总结出的mini-single-spa。
 
 >
 > example 代码示例
