@@ -3,7 +3,9 @@ import {
   reroute
 } from './route'
 
+// 启动标识
 let started = false
+
 /**
  * @description
  */
@@ -17,10 +19,11 @@ function start() {
  * @description 返回是否被启动的Boolean值
  * @returns 
  */
-function isStart() {
+function isStarted() {
   return started
 }
 
 export {
-  isStart
+  start,
+  isStarted
 }

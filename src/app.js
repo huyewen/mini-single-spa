@@ -5,9 +5,13 @@ import {
   NOT_BOOTSTRAPPED,
   NOT_MOUNTED,
   MOUNTED,
+  LOAD_ERR,
   shouldBeActive
 } from './helper'
+
+
 const apps = [] // 存放注册的app
+
 /**
  * @description 保存子应用并预加载被激活的子应用
  * @param {*} appName 子应用名称
@@ -37,9 +41,16 @@ const getAppChange = () => {
   const appsToLoad = [];
   const appsToMount = [];
   const appsToUnmount = [];
+  // 用于加载错误时超过两百毫秒重新加载应用
+  const curentTime = new Date().getTime()
 
   apps.forEach(app => {
     switch(app.status) {
+      case LOAD_ERR:
+        if(shouldBeActive(app) && curentTime - app.loadErrorTime >= 200) {
+          appsToLoad.push(app);
+        }
+        break
       case NOT_LOADED:
       case LOADING_SOURCE_CODE:
         if(shouldBeActive(app)) {
