@@ -1,4 +1,6 @@
 
+import * as singleSpa from '../index'
+
 export const NOT_LOADED = 'NOT_LOADED';
 export const LOADING_SOURCE_CODE = 'LOADING_SOURCE_CODE';
 export const NOT_BOOTSTRAPPED = 'NOT_BOOTSTRAPPED';
@@ -16,7 +18,7 @@ export const LOAD_ERR = 'LOAD_ERR'
  * @param {*} app 子应用
  * @returns boolean
  */
-export function shouldBeActive(app) {
+export function shouldBeActive (app) {
   return app.activeWhen(window.location);
 }
 
@@ -25,7 +27,7 @@ export function shouldBeActive(app) {
  * @param {*} fns 返回值为promise实例的函数或函数数组
  * @returns promise实例
  */
-export function flattenFnArray(fns) {
+export function flattenFnArray (fns) {
   fns = Array.isArray(fns) ? fns : [fns];
 
   /**
@@ -38,4 +40,11 @@ export function flattenFnArray(fns) {
   }
 }
 
+
+export function getProps (app) {
+  return Object.assign(app.customProps, {
+    name: app.appName,
+    singleSpa
+  })
+}
 

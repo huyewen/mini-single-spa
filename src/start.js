@@ -7,7 +7,7 @@ let started = false
 /**
  * @description
  */
-function start() {
+function start () {
   started = true
 
   reroute()
@@ -17,10 +17,11 @@ function start() {
  * @description 返回是否被启动的Boolean值
  * @returns 
  */
-function isStart() {
+function isStart () {
   return started
 }
 
 export {
+  start,
   isStart
 }
