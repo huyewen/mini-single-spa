@@ -28,7 +28,8 @@ let appsThatChanged,
  * 
  * @returns 
  */
-function reroute () {
+export function reroute () {
+  // 每次reroute一次，都收集一次处于以下各个状态的app
   const { appsToLoad, appsToMount, appsToUnmount } = getAppChange();
 
   if (isStart) { // 表示已经启动
@@ -192,8 +193,4 @@ function toUnmountPromise (app) {
       return app
     })
   })
-}
-
-export {
-  reroute
 }

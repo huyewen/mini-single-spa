@@ -1,3 +1,4 @@
+import { reroute } from "./route";
 
 export function CustomEvent (type, params) {
   var event = new CustomEvent(type, {
@@ -8,3 +9,8 @@ export function CustomEvent (type, params) {
 
   return event
 }
+
+function urlChangeEvent() {
+  reroute()
+}
+
