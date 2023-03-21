@@ -5,8 +5,51 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>mini-single-spa</title>
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/systemjs/6.1.1/system.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/systemjs/6.1.1/extras/amd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/systemjs/6.1.1/extras/named-exports.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/systemjs/6.1.1/extras/named-register.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/systemjs/6.1.1/extras/use-default.min.js"></script>
+  <script type="systemjs-importmap">
+    {
+      "imports": {
+        "app1": "http://127.0.0.1:5500/example/app1.js",
+        "app2": "http://127.0.0.1:5500/example/app2.js",
+        "app3": "http://127.0.0.1:5500/example/app3.js",
+        "single-spa": "http://127.0.0.1:5500/src/index.js",
+      }
+    }
+  </script>
 </head>
 <body>
-  
+  <script>
+    (function () {
+      Promise.all([System.import('single-spa')]).then(function (modules) {
+        var singleSpa = modules[0];
+        console.log(11221)
+        singleSpa.registerApplication(
+          'app1',
+          () => System.import('app1'),
+          location => true
+        );
+
+        singleSpa.registerApplication(
+          'app2',
+          () => System.import('app2'),
+          location => location.pathname.startsWith('/app2')
+        )
+
+        singleSpa.registerApplication(
+          'app3',
+          () => System.import('app3'),
+          location => location.pathname.startsWith('/app3')
+        )
+
+        singleSpa.start();
+      })
+    })()
+
+  </script>
 </body>
 </html>

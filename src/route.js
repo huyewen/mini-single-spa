@@ -7,6 +7,8 @@ import {
   NOT_BOOTSTRAPPED,
   NOT_MOUNTED,
   MOUNTED,
+  MOUNTING,
+  UNMOUNTING,
   LOAD_ERR,
   flattenFnArray,
   getProps
@@ -54,6 +56,22 @@ function loadApps () {
 
 /**
  * 
+ * @param {*} appsToLoad 
+ */
+function performAppChanges (appsThatChanged) {
+  /**
+   * 此处将会调用bootstrap，mount，unmount
+   * 加载应用，到这里我们为toLoadPromise新增一个LOADING_SOURCE_CODE状态，避免重复加载
+   */
+  // 本来在unMount前要先unLoad，但是这里我们先省去这一步
+  // 先卸载unMount
+  const unmountPromise = Promise.all(appsThatChanged.map(toUnmountPromise))
+
+  appsToLoad.map(app => toLoadPromise(app).then(app => toBootstrapAndMount(app, unmountPromise))); // 怎么保证调用start时先前注册时激活的子应用已被加载完成？？
+}
+
+/**
+ * 
  * @param {*} app 
  * @returns promise
  * @descripion 加载指定app，使用promise嵌套，最外层的promise由最里层的promise状态决定
@@ -91,13 +109,88 @@ function toLoadPromise (app) {
     }).catch(err => {
       // 资源加载失败
       app.status = LOAD_ERR;
-
+      app.loadErrorTime = new Date().getTime();
       console.log(err);
 
       return app
     })
 
     return app.loadPromises // 外层Promise状态由当前promise状态决定
+  })
+}
+
+
+/**
+ * @description 执行子应用的启动和挂载
+ * @param {*} app 
+ * @returns 
+ */
+function toBootstrapAndMount (app) {
+  return Promise.resolve().then(() => {
+    if (shouldBeActive(app)) {
+      return toBootstrapPromise(app).then(toMountPromise);
+    }
+  })
+}
+
+/**
+ * @description 执行子应用的启动
+ * @param {*} app 
+ * @returns 
+ */
+function toBootstrapPromise (app) {
+  return Promise.resolve().then(() => {
+    if (app.status !== NOT_BOOTSTRAPPED) {
+      return app;
+    }
+
+    app.status = BOOTSTRAPPING; // 启动中
+
+    return app.bootstrap(app.customProps).then(() => {
+      app.NOT_MOUNTED;
+      return app
+    })
+  })
+}
+
+/**
+ * @description 执行子应用的挂载
+ * @param {*} app 
+ * @returns 
+ */
+function toMountPromise () {
+  return Promise.resolve().then(() => {
+    if (app.status !== NOT_MOUNTED) {
+      return app
+    }
+
+    app.status = MOUNTING; // 挂载中
+
+    return app.mount(app.customProps).then(() => {
+      app.status = MOUNTED
+    })
+  })
+}
+
+/**
+ * @description 执行子应用的卸载
+ * @param {*} app 
+ * @returns 
+ */
+function toUnmountPromise (app) {
+  return Promise.resolve().then(() => {
+
+    if (app.status !== MOUNTED) {
+      return app;
+    }
+
+    app.status = UNMOUNTING;
+
+    return app.unmount(app.customProps).then(() => {
+      app.status = NOT_MOUNTED;
+
+      return app
+    })
   })
 }
 

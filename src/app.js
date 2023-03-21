@@ -8,7 +8,10 @@ import {
   LOAD_ERR,
   shouldBeActive
 } from './helper'
+
+
 const apps = [] // 存放注册的app
+
 /**
  * @description 保存子应用并预加载被激活的子应用
  * @param {String} appName 子应用名称
@@ -66,17 +69,23 @@ function getAppNames () {
  * @description 获取当前路由匹配到的处于各状态中的子应用
  * @returns app对象
  */
-function getAppChange () {
-  const appsToLoad = []; // 待加载
-  const appsToMount = []; // 待挂载
-  const appsToUnmount = []; // 待卸载
-
-  const currentTime = new Date().getTime();
+const getAppChange = () => {
+  const appsToLoad = [];
+  const appsToMount = [];
+  const appsToUnmount = [];
+  // 用于加载错误时超过两百毫秒重新加载应用
+  const curentTime = new Date().getTime()
 
   apps.forEach(app => {
     switch (app.status) {
       case LOAD_ERR:
-        if (shouldBeActive && currentTime - app.loadErrorTime >= 200) {
+        if (shouldBeActive(app) && curentTime - app.loadErrorTime >= 200) {
+          appsToLoad.push(app);
+        }
+        break
+      case NOT_LOADED:
+      case LOADING_SOURCE_CODE:
+        if (shouldBeActive(app)) {
           appsToLoad.push(app);
         }
         break;
